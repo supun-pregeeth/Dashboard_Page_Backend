@@ -1,0 +1,131 @@
+Spring Boot Layer Flow
+Here’s the general order for a single request:
+
+ 
+Client (Frontend / Postman)
+|
+v
+Controller (Request Handler)
+|
+vDTO (Carries Data)
+
+|
+v
+Service (Business Logic)
+|
+v
+Entity (Model/Table Structure)
+|
+v
+Repository (Database Access)
+|
+v
+Database
+
+
+1. Controller – Request Handler
+Listens for HTTP requests (@GetMapping, @PostMapping).
+Validates or converts request body into DTO.
+Calls Service Layer to do work.
+Example:
+
+ 
+@RestController
+@RequestMapping("/users")
+public class UserController {
+
+@Autowired
+private UserService userService;
+
+@PostMapping
+public String addUser(@RequestBody UserDto userDto) {
+return userService.createUser(userDto);
+}
+}
+
+✅ Analogy: The waiter takes the customer’s order and hands it to the chef.
+
+
+2. DTO – Data Transfer Object
+Pure data class.
+Carries data from Controller to Service.
+May have validation annotations.
+Example:
+
+ 
+public class UserDto {
+@NotBlank
+private String name;
+@Email
+private String email;
+// getters & setters
+}
+
+✅ Analogy: The order slip that goes to the kitchen.
+
+
+3. Service – Business Logic Layer
+Does actual work:
+
+Validations
+Transformations (DTO → Entity)
+Calling Repository to save data
+Applying business rules
+Example:
+
+ 
+@Service
+public class UserService {
+
+@Autowired
+private UserRepository userRepository;
+
+public String createUser(UserDto userDto) {
+User user = new User(); // Entity/Model
+user.setName(userDto.getName());
+user.setEmail(userDto.getEmail());
+userRepository.save(user);
+return "User created successfully!";
+}
+}
+
+✅ Analogy: Chef cooks the dish using ingredients from pantry (database).
+
+
+4. Entity (Model) – Table Structure
+Represents the data structure stored in the database.
+Annotated with @Entity.
+Example:
+
+ 
+import jakarta.persistence.*;
+
+@Entity
+public class User {
+@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long id;
+private String name;
+private String email;
+}
+
+✅ Analogy: The ingredients in the pantry — ready to be used or stored.
+
+
+5. Repository – Database Access Layer
+Interface that extends JpaRepository.
+Provides CRUD operations out of the box.
+Can define custom queries.
+Example:
+
+ 
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserRepository extends JpaRepository<User, Long> {}
+
+✅ Analogy: The pantry where ingredients (Entities) are stored and retrieved.
+
+
+6. Database – Final Storage
+Stores the actual data persistently.
+Spring Data JPA automatically writes/reads data using Repository.
+✅ Analogy: The kitchen pantry or fridge where ingredients are kept safe.
