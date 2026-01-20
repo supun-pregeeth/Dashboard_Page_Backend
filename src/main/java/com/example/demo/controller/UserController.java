@@ -7,7 +7,7 @@ import com.example.demo.dto.UserSignupDto;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
-@RestController//mapping request as an object
+@RestController //mapping request as an object
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "http://localhost:3000") // your React frontend
 public class UserController {
@@ -15,6 +15,7 @@ public class UserController {
     private final UserService userService;
 
     public UserController(UserService userService) {
+
         this.userService = userService;
     }
 
